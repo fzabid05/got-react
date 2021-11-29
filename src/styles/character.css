@@ -1,0 +1,12 @@
+.characterBox {
+  transition: 0.3s;
+  width: 250px;
+  margin: auto;
+}
+
+.characterBox:hover {
+  transform: scale(1.2);
+}
+.chakra-select__icon {
+  display: none;
+}

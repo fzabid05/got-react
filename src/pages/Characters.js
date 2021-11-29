@@ -1,53 +1,51 @@
-import { Box, Flex, Image } from "@chakra-ui/react";
+import { Box, SimpleGrid } from "@chakra-ui/react";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import Character from "../components/Character";
+import FilterCharacter from "../components/FilterCharacter";
+import Loader from "react-loader-spinner";
 
 const Characters = () => {
   const [data, setData] = useState([]);
+  const [activeFamily, setActiveFamily] = useState("");
+  const [loading, setLoading] = useState(true);
 
+  const Families = data.reduce(
+    (acc, character) =>
+      acc.includes(character.lastName) ? acc : acc.concat(character.lastName),
+    []
+  );
   useEffect(() => {
     axios.get("https://thronesapi.com/api/v2/Characters").then((res) => {
       setData(res.data);
+      setLoading(false);
     });
   }, []);
 
   return (
-    <Flex flexWrap="wrap">
-      {data.map((character) => (
-        <Box maxW="sm" borderWidth="1px" borderRadius="lg" overflow="hidden">
-          <Image
-            boxSize="200px"
-            src={character.imageUrl}
-            alt={character.firstName}
-          />
+    <Box textAlign="center" m="auto">
+      <FilterCharacter
+        activeFamily={activeFamily}
+        setActiveFamily={setActiveFamily}
+        Families={Families}
+      />
+      {loading && (
+        <Loader type="Bars" color="#ffffffd4" height={60} width={60} />
+      )}
 
-          <Box p="6">
-            <Box
-              color="gray.500"
-              fontWeight="semibold"
-              letterSpacing="wide"
-              fontSize="xs"
-              textTransform="uppercase"
-              ml="2"
-            >
-              {character.title}
-            </Box>
-
-            <Box
-              mt="1"
-              fontWeight="semibold"
-              as="h4"
-              lineHeight="tight"
-              isTruncated
-            >
-              {character.firstName} | {character.lastName}
-            </Box>
-
-            <Box>{character.fullName}</Box>
-          </Box>
-        </Box>
-      ))}
-    </Flex>
+      <SimpleGrid
+        minChildWidth="250px"
+        spacing="40px"
+        p="10"
+        textAlign="center"
+      >
+        {data
+          .filter((character) => character.lastName.includes(activeFamily))
+          .map((character) => (
+            <Character character={character} key={character.id} />
+          ))}
+      </SimpleGrid>
+    </Box>
   );
 };
 
